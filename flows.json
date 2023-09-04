@@ -1,0 +1,292 @@
+[
+    {
+        "id": "80d578782794441e",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "1603ec02582bc3aa",
+        "type": "inject",
+        "z": "80d578782794441e",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            },
+            {
+                "p": "params",
+                "v": "",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 110,
+        "y": 180,
+        "wires": [
+            [
+                "2459bac56fe448b3"
+            ]
+        ]
+    },
+    {
+        "id": "2459bac56fe448b3",
+        "type": "function",
+        "z": "80d578782794441e",
+        "name": "function 1",
+        "func": "function geraRandom(min, max){\n    return ((Math.random() * (max - min + 1)) + min).toFixed(2)\n}\n\nconst sensor0 = geraRandom(0,9)\nconst sensor1 = geraRandom(10,19)\nconst sensor2 = geraRandom(20, 29)\n\nconst date = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })\nconst dateFormat = date.substr(6, 4) + \"-\" + date.substr(3, 2) + \"-\" + date.substr(0, 2) + \" \" + date.substr(11, 8)\n\nconst data = { sensor0, sensor1, sensor2, dateFormat }\n\nmsg.params = [sensor0, sensor1, sensor2, dateFormat]\nmsg.payload = data\n\nreturn msg",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
+        "y": 180,
+        "wires": [
+            [
+                "e5b85434a4d69211",
+                "f77570f78e930326",
+                "52146677787ac83f",
+                "e9b28599fc1b1434"
+            ]
+        ]
+    },
+    {
+        "id": "e5b85434a4d69211",
+        "type": "function",
+        "z": "80d578782794441e",
+        "name": "function 2",
+        "func": "const query = \"INSERT INTO sensores(sensor0, sensor1, sensor2, date_at) VALUES(\"+\n    \"'\" + msg.payload.sensor0 + \"',\" +\n    \"'\" + msg.payload.sensor1 + \"',\" +\n    \"'\"+ msg.payload.sensor2 + \"',\" +\n    \"'\" + msg.payload.dateFormat + \"')\"\n\n\nmsg.payload = query\nmsg.topic = query\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 540,
+        "y": 80,
+        "wires": [
+            [
+                "e5d78c6de34fbf82"
+            ]
+        ]
+    },
+    {
+        "id": "e5d78c6de34fbf82",
+        "type": "mysql",
+        "z": "80d578782794441e",
+        "mydb": "13b1e1d629d1f7af",
+        "name": "teste",
+        "x": 785,
+        "y": 80,
+        "wires": [
+            []
+        ],
+        "l": false
+    },
+    {
+        "id": "f77570f78e930326",
+        "type": "postgresql",
+        "z": "80d578782794441e",
+        "name": "",
+        "query": "insert into sensores (sensor0,sensor1,sensor2,date_at)\nvalues($1,$2,$3,$4)",
+        "postgreSQLConfig": "e12e9caab78e8389",
+        "split": false,
+        "rowsPerMsg": 1,
+        "outputs": 1,
+        "x": 785,
+        "y": 160,
+        "wires": [
+            []
+        ],
+        "l": false
+    },
+    {
+        "id": "52146677787ac83f",
+        "type": "mongodb out",
+        "z": "80d578782794441e",
+        "mongodb": "4862af4b3b5c3322",
+        "name": "",
+        "collection": "sensores",
+        "payonly": true,
+        "upsert": false,
+        "multi": false,
+        "operation": "store",
+        "x": 900,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "7c4e91561b177513",
+        "type": "http in",
+        "z": "80d578782794441e",
+        "name": "",
+        "url": "/sensores",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 100,
+        "y": 320,
+        "wires": [
+            [
+                "10cd518d42893b21"
+            ]
+        ]
+    },
+    {
+        "id": "9fc2dea5aec38342",
+        "type": "http response",
+        "z": "80d578782794441e",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 650,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "e9b28599fc1b1434",
+        "type": "change",
+        "z": "80d578782794441e",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 480,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "10cd518d42893b21",
+        "type": "change",
+        "z": "80d578782794441e",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "flow"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 300,
+        "y": 320,
+        "wires": [
+            [
+                "dac7c3e54c2275f5"
+            ]
+        ]
+    },
+    {
+        "id": "dac7c3e54c2275f5",
+        "type": "template",
+        "z": "80d578782794441e",
+        "name": "",
+        "field": "payload",
+        "fieldType": "flow",
+        "format": "text",
+        "syntax": "mustache",
+        "template": "",
+        "output": "str",
+        "x": 400,
+        "y": 380,
+        "wires": [
+            [
+                "9fc2dea5aec38342",
+                "4be6f34235c2562c"
+            ]
+        ]
+    },
+    {
+        "id": "4be6f34235c2562c",
+        "type": "debug",
+        "z": "80d578782794441e",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 600,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "13b1e1d629d1f7af",
+        "type": "MySQLdatabase",
+        "name": "",
+        "host": "172.19.0.1",
+        "port": "3306",
+        "db": "teste",
+        "tz": "",
+        "charset": "UTF8"
+    },
+    {
+        "id": "e12e9caab78e8389",
+        "type": "postgreSQLConfig",
+        "name": "",
+        "host": "172.19.0.1",
+        "hostFieldType": "str",
+        "port": "5432",
+        "portFieldType": "num",
+        "database": "postgres",
+        "databaseFieldType": "str",
+        "ssl": "false",
+        "sslFieldType": "bool",
+        "applicationName": "",
+        "applicationNameType": "str",
+        "max": "10",
+        "maxFieldType": "num",
+        "idle": "1000",
+        "idleFieldType": "num",
+        "connectionTimeout": "10000",
+        "connectionTimeoutFieldType": "num",
+        "user": "rec",
+        "userFieldType": "str",
+        "password": "rec*1212",
+        "passwordFieldType": "str"
+    },
+    {
+        "id": "4862af4b3b5c3322",
+        "type": "mongodb",
+        "hostname": "172.19.0.1",
+        "topology": "direct",
+        "connectOptions": "",
+        "port": "27017",
+        "db": "teste",
+        "name": ""
+    }
+]
